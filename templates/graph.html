@@ -1,0 +1,21 @@
+<h2>Graphique:</h2>
+
+<svg id="graphContainer" class="raw">
+    <g/>
+</svg>
+
+<script>
+    try {
+        var g = graphlibDot.parse(`{{dot_graph | safe}}`);
+        // Render the graphlib object using d3.
+        var renderer = new dagreD3.Renderer();
+        renderer.run(g, d3.select("svg g"));
+
+        // Optional - resize the SVG element based on the contents.
+        var svg = document.querySelector('#graphContainer');
+        var bbox = svg.getBBox();
+        svg.style.width = bbox.width + 40.0 + "px";
+        svg.style.height = bbox.height + 40.0 + "px";
+    } catch (error) {
+    }
+</script>

@@ -1,0 +1,25 @@
+<h2>Code décoquillé:</h2>
+<div id="disasm" class="raw">
+    <table>
+        <thead>
+            <tr>
+                <th>addr</th>
+                <th>opcodes</th>
+                <th></th>
+                <th>mnemonic</th>
+                <th>operands</th>
+            </tr>
+        </thead>
+        <tbody style="padding-top: 10px">
+            {% for addr, item in disasm_table.items() %}
+            <tr>
+                <td>{{addr}}:</td>
+                <td style="color: gray;">{{item.opcodes}}</td>
+                <td></td>
+                <td id="mnemo">{{item.mnemonic}}</td>
+                <td>{{item.operands}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

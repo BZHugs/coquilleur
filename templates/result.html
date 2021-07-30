@@ -1,0 +1,16 @@
+<div id="result" >
+{% if bytescodes_table is defined %}
+{% include 'asm.html' %}
+{% endif %}
+
+
+
+{% if disasm_table is defined %}
+{% include 'disasm.html' %}
+{% endif %}
+
+
+{% if dot_graph is defined %}
+{% include 'graph.html' %}
+{% endif %}
+</div>

@@ -1,0 +1,14 @@
+<h2>Code encoquillé:</h2>
+<div class="raw">
+    <h3>Longueur du code encoquillé:</h3>
+    <p>{{size}} octet{{ "s" if size > 1 else "" }}</p>
+
+    <h3>Hexadécimale:</h3>
+    <p>{{bytescodes_table.raw_hex | safe}}</p>
+
+    <h3>Chaine échapée:</h3>
+    <p>{{bytescodes_table.escaped_str}}</p>
+
+    <h3>Tableau:</h3>
+    <p>{{bytescodes_table.array_literal}}</p>
+</div>

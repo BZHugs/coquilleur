@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Coquilleur | Décoquilleur</title>
+
+    <link rel="icon" href="{{url_for('static', filename='favicon.ico')}}" />
+
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}" />
+
+    <!-- codeMirror library -->
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='codeMirror/css/codemirror.css')}}" />
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='codeMirror/css/codemirror-custom.css')}}" />
+
+    {% for theme in themes %}
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='codeMirror/css/themes/'+theme+'.css')}}" />
+    {% endfor %}
+
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/codemirror.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/AsmArm.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/AsmAarch64.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/Asm86.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/Asm64.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/active-line.js')}}"></script>
+
+    <!-- d3 & graphlib libraries -->
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='graph/css/graph.css')}}" />
+
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='graph/js/d3.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='graph/js/graphlib-dot.js')}}"></script>
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='graph/js/dagre-d3.js')}}"></script>
+
+</head>
+
+<body>
+    <div id="content">
+
+        <div id="logo">
+            <a href="/"><img src="{{url_for('static', filename='coquillage.png')}}" /></a>
+        </div>
+
+        {% if error is defined %}
+        <p style="color: red; ">{{error}}</p>
+        {% endif %}
+
+        <div id="forms">
+            <form action="/compile#result" method="POST" onsubmit="submit_asm()">
+                <textarea id="code" name="asm" spellcheck="false">{{asm_value}}</textarea>
+
+                <div style="display: flex;justify-content: space-between;">
+                    <p>
+                        <label for="select">Theme:</label>
+                        <select name="theme" id="select" onchange="selectTheme()">
+                            <option selected>default</option>
+                            {% for theme in themes %}
+                            <option>{{theme}}</option>
+                            {% endfor %}
+                        </select>
+                    </p>
+                    <p>
+                        <input type="radio" name="arch" id="arm" value="arm" /> arm
+                        <input type="radio" name="arch" id="aarch64" value="aarch64" /> aarch64
+                        <input type="radio" name="arch" id="x86" value="x86" /> x86
+                        <input type="radio" name="arch" id="x86_64" value="x86_64" checked=checked /> x86_64
+
+                        <input type="submit" value="Encoquiller" />
+                    </p>
+                </div>
+            </form>
+            <hr />
+            <form action="/disasm#result" method="POST">
+                <textarea rows="15" cols="80" name="bytecodes" id="bytescodes">{{bcode_value}}</textarea>
+
+                <div style="display: flex;justify-content: space-between;">
+                    <p>
+                        Base: <input type="text" name="base" value="{{base | default('0x1000', true)}}" />
+                    </p>
+                    <p>
+                        <input type="radio" name="arch" id="arm" value="arm" /> arm
+                        <input type="radio" name="arch" id="aarch64" value="aarch64" /> aarch64
+                        <input type="radio" name="arch" id="x86" value="x86" /> x86
+                        <input type="radio" name="arch" id="x86_64" value="x86_64" checked=checked /> x86_64
+
+                        <input type="submit" value="Décoquiller" />
+                    </p>
+                </div>
+            </form>
+        </div>
+
+        {% if result is defined %}
+        {% include 'result.html' %}
+        {% endif %}
+
+
+        <footer></footer>
+    </div>
+
+    {% if old_checked is defined %}
+    <script>
+        var old_checked = "{{old_checked}}";
+        var el = document.getElementsByClassName(old_checked);
+        for (var i = 0; i < el.length; i++) {
+            el[i].checked = true;
+            change_language(el[i].id);
+        }
+    </script>
+    {% endif %}
+
+    <script>
+        var editor = null;
+
+        window.onload = function() {
+            editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+                lineNumbers: true,
+                styleActiveLine: true,
+                dragDrop: false,
+                tabSize: 4,
+                indentUnit: 4,
+                smartIndent: false,
+                indentWithTabs: true,
+                showCursorWhenSelecting: true,
+                mode: "asm64"
+            });
+
+            var theme = getCookie("theme");
+            if (theme) {
+                input.value = theme;
+                editor.setOption("theme", theme);
+            }
+        }
+
+        function submit_asm() {
+            editor.save();
+            return true;
+        }
+
+        document.body.addEventListener("change", function (e) {
+            let target = e.target;
+            change_language(target.id);
+        });
+
+        function change_language(id) {
+            switch(id) {
+                case "arm":
+                    editor.setOption("mode", "asmarm");
+                    break;
+                case "aarch64":
+                    editor.setOption("mode", "asmaarch64");
+                    break;
+                case "x86":
+                    editor.setOption("mode", "asm86");
+                    break;
+                case "x86_64":
+                    editor.setOption("mode", "asm64");
+                    break;
+                default:
+                    console.log("Error. Language not supported.")
+                    break;
+            }
+        }
+
+        var input = document.getElementById("select");
+
+        function selectTheme(){
+            var theme = input.options[input.selectedIndex].textContent;
+            editor.setOption("theme", theme);
+            setCookie("theme", theme);
+        }
+
+        function setCookie(name, value) {
+            document.cookie = name + "=" + (value || "") + "; path=/";
+        }
+
+        function getCookie(name) {
+            var nameEQ =  name + "=";
+            var ca = document.cookie.split(";");
+            for(var i = 0; i < ca.length; i++){
+                var c = ca[i];
+                while(c.charCodeAt(0)==' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+    </script>
+</body>
+</html>
