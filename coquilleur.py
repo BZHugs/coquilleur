@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import io
 import os
 import re
 import sys
@@ -162,6 +163,7 @@ def format_compile(bcode):
     escaped_str = ""
     escaped_str_raw = ""
     array_literal = "{"
+    array_literal_raw = ""
     bytes_array = bytearray()
     size = 0
 
@@ -175,6 +177,8 @@ def format_compile(bcode):
             array_literal += f"0x{h}, "
         
         escaped_str_raw += f"\\x{h}"
+        array_literal_raw += f"0x{h}, "
+
 
         bytes_array.append(b)
         size += 1
@@ -198,6 +202,7 @@ def format_compile(bcode):
     bytescodes_table["escaped_str"] = escaped_str
     bytescodes_table["escaped_str_raw"] = escaped_str_raw
     bytescodes_table["array_literal"] = array_literal
+    bytescodes_table["array_literal_raw"] = array_literal_raw
     bytescodes_table["size"] = size
     bytescodes_table["bytes"] = bytes_array
 
@@ -225,8 +230,6 @@ def actions():
         return hello()
 
 
-
-# @app.route("/disasm", methods=["POST"])
 def disasm_post():
     original_bcode = request.form.get("bytecodes").strip()
     bcode_escaped = original_bcode
@@ -293,8 +296,6 @@ def disasm_post():
         dot_graph=dot_graph
     )
 
-
-# @app.route("/compile", methods=["POST"])
 def compile_post():
     code = request.form.get("asm") + "\n"
 
@@ -344,7 +345,6 @@ def compile_post():
         themes=themes,
         dot_graph=dot_graph
     )
-
 
 if __name__ == "__main__":
     app.run(debug=DEBUG, host="0.0.0.0", port=80)
