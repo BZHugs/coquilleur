@@ -186,7 +186,7 @@ def format_compile(bcode):
     
     array_literal = array_literal[:-2] + "}"
 
-    padded_bcode = bcode + ["\x00"] * (len(bcode) % 8)
+    padded_bcode = bcode + [0] * (8 - len(bcode) % 8)
 
     floats = "["
 
