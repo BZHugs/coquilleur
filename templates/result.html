@@ -11,7 +11,9 @@
 
 
 {% if dot_graph is defined %}
+{% if dot_graph != "" %}
 {% include 'graph.html' %}
+{% endif %}
 {% endif %}
 </div>
 
