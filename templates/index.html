@@ -44,7 +44,9 @@
         {% endif %}
 
         <div id="forms">
-            <form action="/compile#result" method="POST" onsubmit="submit_asm()">
+            <form action="/#result" method="POST" onsubmit="submit_asm()">
+                <input type="hidden" name="action" value="compile" />
+
                 <textarea id="code" name="asm" spellcheck="false">{{asm_value}}</textarea>
 
                 <div style="display: flex;justify-content: space-between;">
@@ -68,7 +70,9 @@
                 </div>
             </form>
             <hr />
-            <form action="/disasm#result" method="POST">
+            <form action="/#result" method="POST">
+                <input type="hidden" name="action" value="disasm" />
+                
                 <textarea rows="15" cols="80" name="bytecodes" id="bytescodes">{{bcode_value}}</textarea>
 
                 <div style="display: flex;justify-content: space-between;">

@@ -14,6 +14,7 @@ from flask_table import create_table, Col, LinkCol
 
 from graph import generate_graph
 
+DEBUG = (os.getenv('DEBUG_APP') != None)
 
 app = Flask(__name__)
 
@@ -185,7 +186,7 @@ def format_compile(bcode):
     return bytescodes_table
 
 
-@app.route("/")
+@app.route("/", methods=["GET"])
 def hello():
     return render_template(
         "index.html",
@@ -194,8 +195,20 @@ def hello():
         themes=themes
     )
 
+@app.route("/", methods=["POST"])
+def actions():
+    action = request.form.get("action")
 
-@app.route("/disasm", methods=["POST"])
+    if action == "disasm":
+        return disasm_post(request)
+    elif action == "compile":
+        return compile_post()
+    else:
+        return hello()
+
+
+
+# @app.route("/disasm", methods=["POST"])
 def disasm_post():
     original_bcode = request.form.get("bytecodes").strip()
     bcode_escaped = original_bcode
@@ -262,8 +275,8 @@ def disasm_post():
     )
 
 
-@app.route("/compile", methods=["POST"])
-def asm():
+# @app.route("/compile", methods=["POST"])
+def compile_post():
     code = request.form.get("asm") + "\n"
 
     arch = request.form.get("arch")
@@ -315,4 +328,4 @@ def asm():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=80)
+    app.run(debug=DEBUG, host="0.0.0.0", port=80)
