@@ -200,7 +200,7 @@ def actions():
     action = request.form.get("action")
 
     if action == "disasm":
-        return disasm_post(request)
+        return disasm_post()
     elif action == "compile":
         return compile_post()
     else:
@@ -212,6 +212,7 @@ def actions():
 def disasm_post():
     original_bcode = request.form.get("bytecodes").strip()
     bcode_escaped = original_bcode
+    
     # If the bcode is composed of leaked pointers, such as
     # 0xb940c26a110012e9\n0x540001486b0a013f\n, first convert it to escaped
     # bytecode first to keep the rest of the function generic
@@ -221,7 +222,7 @@ def disasm_post():
     if bcode_escaped == "":
         return render_template(
             "index.html",
-            error=f"Error: no bytecodes! (MAIS T'ES PAS NET BAUPTISTE)",
+            error=f"Error: no bytecodes!",
             bcode_value=bcode_escaped,
             themes=themes
         )
@@ -298,7 +299,7 @@ def compile_post():
     try:
         x, _ = ks.asm(code_without_comments, 0)
         if x == None:
-            raise ValueError("Invalid code (MAIS T'ES PAS NET BAUPTISTE)")
+            raise ValueError("Invalid code")
     except (keystone.keystone.KsError, ValueError) as err:
         return render_template(
             "index.html",

@@ -60,10 +60,10 @@
                         </select>
                     </p>
                     <p>
-                        <input type="radio" name="arch" id="arm" value="arm" /> arm
-                        <input type="radio" name="arch" id="aarch64" value="aarch64" /> aarch64
-                        <input type="radio" name="arch" id="x86" value="x86" /> x86
-                        <input type="radio" name="arch" id="x86_64" value="x86_64" checked=checked /> x86_64
+                        <input type="radio" name="arch" class="arm" value="arm" /> arm
+                        <input type="radio" name="arch" class="aarch64" value="aarch64" /> aarch64
+                        <input type="radio" name="arch" class="x86" value="x86" /> x86
+                        <input type="radio" name="arch" class="x86_64" value="x86_64" checked=checked /> x86_64
 
                         <input type="submit" value="Encoquiller" />
                     </p>
@@ -80,10 +80,10 @@
                         Base: <input type="text" name="base" value="{{base | default('0x1000', true)}}" />
                     </p>
                     <p>
-                        <input type="radio" name="arch" id="arm" value="arm" /> arm
-                        <input type="radio" name="arch" id="aarch64" value="aarch64" /> aarch64
-                        <input type="radio" name="arch" id="x86" value="x86" /> x86
-                        <input type="radio" name="arch" id="x86_64" value="x86_64" checked=checked /> x86_64
+                        <input type="radio" name="arch" class="arm" value="arm" /> arm
+                        <input type="radio" name="arch" class="aarch64" value="aarch64" /> aarch64
+                        <input type="radio" name="arch" class="x86" value="x86" /> x86
+                        <input type="radio" name="arch" class="x86_64" value="x86_64" checked=checked /> x86_64
 
                         <input type="submit" value="Décoquiller" />
                     </p>
@@ -98,17 +98,6 @@
 
         <footer></footer>
     </div>
-
-    {% if old_checked is defined %}
-    <script>
-        var old_checked = "{{old_checked}}";
-        var el = document.getElementsByClassName(old_checked);
-        for (var i = 0; i < el.length; i++) {
-            el[i].checked = true;
-            change_language(el[i].id);
-        }
-    </script>
-    {% endif %}
 
     <script>
         var editor = null;
@@ -131,6 +120,18 @@
                 input.value = theme;
                 editor.setOption("theme", theme);
             }
+
+            {% if old_checked is defined %}
+
+            var old_checked = "{{old_checked}}";
+            var el = document.getElementsByClassName(old_checked);
+
+            for (var i = 0; i < el.length; i++) {
+                el[i].checked = true;
+                change_language(el[i].value);
+            }
+
+            {% endif %}
         }
 
         function submit_asm() {
@@ -140,11 +141,11 @@
 
         document.body.addEventListener("change", function (e) {
             let target = e.target;
-            change_language(target.id);
+            change_language(target.value);
         });
 
-        function change_language(id) {
-            switch(id) {
+        function change_language(lang) {
+            switch(lang) {
                 case "arm":
                     editor.setOption("mode", "asmarm");
                     break;
