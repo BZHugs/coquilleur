@@ -160,6 +160,7 @@ def format_compile(bcode):
 
     raw_hex = ""
     escaped_str = ""
+    escaped_str_raw = ""
     array_literal = "{"
     bytes_array = bytearray()
     size = 0
@@ -167,18 +168,35 @@ def format_compile(bcode):
     for b in bcode:
         h = hex_(b, 2)
         if h in bad_char:
-            raw_hex += f"<b id='bad'>{h}</b>"
+            escaped_str += f"<b id='bad'>\\x{h}</b>"
+            array_literal += f"<b id='bad'>0x{h}</b>, "
         else:
-            raw_hex += h
-        escaped_str += f"\\x{h}"
-        array_literal += f"0x{h}, "
+            escaped_str += f"\\x{h}"
+            array_literal += f"0x{h}, "
+        
+        escaped_str_raw += f"\\x{h}"
+
         bytes_array.append(b)
         size += 1
 
+    
     array_literal = array_literal[:-2] + "}"
 
-    bytescodes_table["raw_hex"] = raw_hex
+    padded_bcode = bcode + ["\x00"] * (len(bcode) % 8)
+
+    floats = "["
+
+    for i in range(0, len(padded_bcode), 8):
+        bloc = bytes(padded_bcode[i:i+8])
+        float = struct.unpack("d", bloc[::-1])[0]
+        floats += f"{float}, "
+
+    floats = floats[:-2] + "]"
+
+
+    bytescodes_table["floats"] = floats
     bytescodes_table["escaped_str"] = escaped_str
+    bytescodes_table["escaped_str_raw"] = escaped_str_raw
     bytescodes_table["array_literal"] = array_literal
     bytescodes_table["size"] = size
     bytescodes_table["bytes"] = bytes_array
@@ -321,7 +339,7 @@ def compile_post():
         disasm_table=disasm_table,
         bytescodes_table=bytescodes_table,
         asm_value=code,
-        bcode_value=bytescodes_table["escaped_str"],
+        bcode_value=bytescodes_table["escaped_str_raw"],
         old_checked=arch,
         themes=themes,
         dot_graph=dot_graph
