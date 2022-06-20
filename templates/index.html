@@ -12,10 +12,6 @@
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='codeMirror/css/codemirror.css')}}" />
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='codeMirror/css/codemirror-custom.css')}}" />
 
-    {% for theme in themes %}
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='codeMirror/css/themes/'+theme+'.css')}}" />
-    {% endfor %}
-
     <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/codemirror.js')}}"></script>
     <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/AsmArm.js')}}"></script>
     <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='codeMirror/js/AsmAarch64.js')}}"></script>
@@ -50,8 +46,8 @@
 
                 <div style="display: flex;justify-content: space-between;">
                     <p>
-                        <label for="select">Theme:</label>
-                        <select name="theme" id="select" onchange="selectTheme()">
+                        <label for="shellcodes">Shellcodes:</label>
+                        <select name="shellcodes" id="select" onchange="selectSC()">
                             <option selected>default</option>
                             {% for theme in themes %}
                             <option>{{theme}}</option>
@@ -114,12 +110,6 @@
                 mode: "asm64"
             });
 
-            var theme = getCookie("theme");
-            if (theme) {
-                input.value = theme;
-                editor.setOption("theme", theme);
-            }
-
             {% if old_checked is defined %}
 
             var old_checked = "{{old_checked}}";
@@ -161,29 +151,6 @@
                     console.log("Error. Language not supported.")
                     break;
             }
-        }
-
-        var input = document.getElementById("select");
-
-        function selectTheme(){
-            var theme = input.options[input.selectedIndex].textContent;
-            editor.setOption("theme", theme);
-            setCookie("theme", theme);
-        }
-
-        function setCookie(name, value) {
-            document.cookie = name + "=" + (value || "") + "; path=/";
-        }
-
-        function getCookie(name) {
-            var nameEQ =  name + "=";
-            var ca = document.cookie.split(";");
-            for(var i = 0; i < ca.length; i++){
-                var c = ca[i];
-                while(c.charCodeAt(0)==' ') c = c.substring(1, c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-            }
-            return null;
         }
     </script>
 </body>
