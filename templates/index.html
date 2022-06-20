@@ -25,6 +25,10 @@
     <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='graph/js/d3.js')}}"></script>
     <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='graph/js/graphlib-dot.js')}}"></script>
     <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='graph/js/dagre-d3.js')}}"></script>    
+
+    <!-- shellcodes exemple-->
+    <script type="text/javascript" charset="utf-8" src="{{url_for('static', filename='shellcodes.js')}}"></script>
+
 </head>
 
 <body>
@@ -47,12 +51,7 @@
                 <div style="display: flex;justify-content: space-between;">
                     <p>
                         <label for="shellcodes">Shellcodes:</label>
-                        <select name="shellcodes" id="select" onchange="selectSC()">
-                            <option selected>default</option>
-                            {% for theme in themes %}
-                            <option>{{theme}}</option>
-                            {% endfor %}
-                        </select>
+                        <select name="shellcodes" id="shellcodes" onchange="selectSC()"></select>
                     </p>
                     <p>
                         <input type="radio" name="arch" class="arm" value="arm" /> arm
@@ -96,6 +95,7 @@
 
     <script>
         var editor = null;
+        var shellcodes_select;
 
         window.onload = function() {
             editor = CodeMirror.fromTextArea(document.getElementById("code"), {
@@ -121,7 +121,45 @@
             }
 
             {% endif %}
+
+            shellcodes_select = document.getElementById('shellcodes');
+
+            for (let i = 0; i < SHELLCODES.length; i++) {
+                const shellcode = SHELLCODES[i];
+                var opt = document.createElement('option');
+                opt.value = shellcode.name;
+                opt.innerHTML = shellcode.name;
+                shellcodes_select.appendChild(opt);
+            }
+
+            {% if asm_value == "" %}
+            editor.setValue(atob(SHELLCODES[0].shellcode));
+            {% endif %}
         }
+        function selectSC(){
+            const id = shellcodes_select.selectedIndex;
+            const shellcode = SHELLCODES[id];
+            editor.setValue(atob(shellcode.shellcode));
+            
+            change_language(shellcode.arch);
+
+            
+            var selectedValue = document.querySelector('input[name="arch"]:checked');
+            for (let i = 0; i < selectedValue.length; i++) {
+                const element = selectedValue[i];
+                element.checked = false;
+            }
+
+            let radios = document.getElementsByClassName(shellcode.arch);
+
+            for (let i = 0; i < radios.length; i++) {
+                const element = radios[i];
+                element.checked = true;
+            }
+
+            document.getElementById("bytescodes").innerText = "";
+        }
+
 
         function submit_asm() {
             editor.save();

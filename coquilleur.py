@@ -19,23 +19,6 @@ DEBUG = (os.getenv('DEBUG_APP') != None)
 
 app = Flask(__name__)
 
-asm_exemple = """push rax
-pop rsi
-
-cmp rax, rsi
-jne foo
-mov rax, 1
-jmp bar
-foo:
-mov rax, 0
-
-bar:
-ret
-"""
-
-bcode_exemple = "\\x50\\x5e\\x48\\x39\\xf0\\x75\\x09\\x48\\xc7\\xc0\\x01\\x00\\x00\\x00\\xeb\\x07\\x48\\xc7\\xc0\\x00\\x00\\x00\\x00\\xc3"
-
-
 supported_archs = {
     "x86_64": (
         capstone.CS_MODE_64,
@@ -62,10 +45,6 @@ supported_archs = {
         keystone.KS_ARCH_ARM64,
     ),
 }
-
-themes = [theme.split("/")[-1].replace(".css", "") for theme in glob.glob("static/codeMirror/css/themes/*.css")]
-
-themes = sorted(themes)
 
 def _hex(n):
     return hex(n)[2:].zfill(2)
@@ -213,9 +192,8 @@ def format_compile(bcode):
 def hello():
     return render_template(
         "index.html",
-        bcode_value=bcode_exemple,
-        asm_value=asm_exemple,
-        themes=themes
+        bcode_value="\\x50\\x5e\\x48\\x39\\xf0\\x75\\x09\\x48\\xc7\\xc0\\x01\\x00\\x00\\x00\\xeb\\x07\\x48\\xc7\\xc0\\x00\\x00\\x00\\x00\\xc3",
+        asm_value=""
     )
 
 @app.route("/", methods=["POST"])
@@ -244,8 +222,7 @@ def disasm_post():
         return render_template(
             "index.html",
             error=f"Error: no bytecodes!",
-            bcode_value=bcode_escaped,
-            themes=themes
+            bcode_value=bcode_escaped
         )
 
     bcode = (
@@ -257,8 +234,7 @@ def disasm_post():
         return render_template(
             "index.html",
             error=f"Error: Invalid arch!",
-            bcode_value=bcode_escaped,
-            themes=themes
+            bcode_value=bcode_escaped
         )
 
     raw_base = request.form.get("base")
@@ -271,8 +247,7 @@ def disasm_post():
         return render_template(
             "index.html",
             error=f"Error: {err}",
-            bcode_value=bcode_escaped,
-            themes=themes
+            bcode_value=bcode_escaped
         )
 
     cs_mode, cs_arch, _, _ = supported_archs[arch]
@@ -292,7 +267,6 @@ def disasm_post():
         disasm_table=disasm_table,
         bcode_value=original_bcode,
         old_checked=arch,
-        themes=themes,
         dot_graph=dot_graph
     )
 
@@ -304,8 +278,7 @@ def compile_post():
         return render_template(
             "index.html",
             error=f"Error: Invalid arch!",
-            asm_value=code,
-            themes=themes
+            asm_value=code
         )
 
     cs_mode, cs_arch, ks_mode, ks_arch = supported_archs[arch]
@@ -323,8 +296,7 @@ def compile_post():
         return render_template(
             "index.html",
             error=f"Error: {err}",
-            asm_value=code,
-            themes=themes
+            asm_value=code
         )
 
     bytescodes_table = format_compile(x)
@@ -342,7 +314,6 @@ def compile_post():
         asm_value=code,
         bcode_value=bytescodes_table["escaped_str_raw"],
         old_checked=arch,
-        themes=themes,
         dot_graph=dot_graph
     )
 
