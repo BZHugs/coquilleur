@@ -2,13 +2,17 @@ FROM debian:latest
 
 RUN apt update
 
-RUN apt install -y python3 python3-dev python3-pip python3-setuptools build-essential libssl-dev libffi-dev
+RUN apt install -y python3 python3-dev python3-pip python3-setuptools build-essential libssl-dev libffi-dev git
 
 WORKDIR /tmp
 
-COPY radare2_5.3.1_amd64.deb /tmp
+RUN git clone https://github.com/radareorg/radare2
 
-RUN dpkg -i /tmp/radare2_5.3.1_amd64.deb
+RUN radare2/sys/install.sh
+
+# COPY radare2_5.3.1_amd64.deb /tmp
+
+# RUN dpkg -i /tmp/radare2_5.3.1_amd64.deb
 
 COPY requirements.txt /tmp
 
