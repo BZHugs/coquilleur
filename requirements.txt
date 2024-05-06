@@ -1,5 +1,5 @@
 gunicorn
-flask
+flask==2.3.1
 flask_table
 keystone-engine
 capstone==5.0.1
