@@ -318,7 +318,7 @@ def compile_post():
     disasm_table = disasm(md, bytes(x), base)
 
     
-    dot_graph = generate_graph(bytescodes_table["bytes"], arch, 0)
+    dot_graph = generate_graph(bytescodes_table["bytes"], arch, base)
 
     return render_template(
         "index.html",
