@@ -50,6 +50,9 @@
 
                 <div style="display: flex;justify-content: space-between;">
                     <p>
+                        Base: <input type="text" name="base" value="{{base | default('0', true)}}" />
+                    </p>
+                    <p>
                         <label for="shellcodes">Shellcodes:</label>
                         <select name="shellcodes" id="shellcodes" onchange="selectSC()"></select>
                     </p>
@@ -71,7 +74,7 @@
 
                 <div style="display: flex;justify-content: space-between;">
                     <p>
-                        Base: <input type="text" name="base" value="{{base | default('0x1000', true)}}" />
+                        Base: <input type="text" name="base" value="{{base | default('0', true)}}" />
                     </p>
                     <p>
                         <input type="radio" name="arch" class="arm" value="arm" /> arm

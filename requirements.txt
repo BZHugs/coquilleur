@@ -2,5 +2,5 @@ gunicorn
 flask
 flask_table
 keystone-engine
-capstone==5.0.0rc2
+capstone==5.0.1
 r2pipe

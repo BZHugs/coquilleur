@@ -271,6 +271,21 @@ def disasm_post():
     )
 
 def compile_post():
+
+    raw_base = request.form.get("base")
+
+    try:
+        base = int(raw_base, 16)
+        if base < 0:
+            raise ValueError("No negative base please.")
+    except ValueError as err:
+        return render_template(
+            "index.html",
+            error=f"Error: {err}",
+            bcode_value=bcode_escaped
+        )
+
+
     code = request.form.get("asm") + "\n"
 
     arch = request.form.get("arch")
@@ -289,7 +304,7 @@ def compile_post():
     code_without_comments = re.sub(";.+\\n", "\\n", code)
 
     try:
-        x, _ = ks.asm(code_without_comments, 0)
+        x, _ = ks.asm(code_without_comments, base)
         if x == None:
             raise ValueError("Invalid code")
     except (keystone.keystone.KsError, ValueError) as err:
@@ -300,7 +315,7 @@ def compile_post():
         )
 
     bytescodes_table = format_compile(x)
-    disasm_table = disasm(md, bytes(x), 0)
+    disasm_table = disasm(md, bytes(x), base)
 
     
     dot_graph = generate_graph(bytescodes_table["bytes"], arch, 0)
@@ -308,6 +323,7 @@ def compile_post():
     return render_template(
         "index.html",
         result=True,
+        base=raw_base,
         size=bytescodes_table["size"],
         disasm_table=disasm_table,
         bytescodes_table=bytescodes_table,
